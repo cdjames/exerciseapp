@@ -1,0 +1,42 @@
+<!--
+	** Author: Collin James, CS 290
+	** Date: 5/24/16
+	** Description: Final Project - Database Interactions and UI
+-->
+<div>
+	<div>
+		<form id="addexercise" method="post"> <!-- UPDATE THIS -->
+	      <fieldset>
+	        <legend>Add User</legend>
+	        <label for="name">Name</label>
+	        <input type="text" name="name" id="name">
+	        <label for="listname">List Name</label>
+	        <input type="text" name="listname" id="listname">
+	         <label for="DOB">Date of birth</label>
+	        <!-- <input type="text" name="DOB" id="DOB"> -->
+	        <select id="DOByears">
+	        </select>
+	        <select id="DOBmonths">
+	        </select>
+	        <select id="DOBdays">
+	        </select>
+	        <input type="submit" id="add" value="Add User">
+	      </fieldset>
+	    </form>
+    </div>
+	<div>
+		<table id="exercises">
+			<tr>
+				<th>Username</th>
+				<th>DOB</th>
+				<th>List</th>
+			</tr>
+			<tr>
+				<td>Sample Guy</td>
+				<td>1980-03-13</td>
+				<!-- example php anchor; want to change later, make dynamic -->
+				<td><a href="list.php?id=1">Mylist</a></td>
+			</tr>
+		</table>
+	</div>
+</div>

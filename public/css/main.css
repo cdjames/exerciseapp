@@ -1,0 +1,207 @@
+/* 
+	** Author: Collin James, CS 290
+	** Date: 5/18/16
+	** Description: Activity: How-To Guide, css
+*/
+body {
+	padding: 0px;
+	margin: 0px;
+	overflow-x: hidden;
+	font-size: 140%;
+}
+
+div, article, footer{
+	padding: 0px 10px;
+}
+
+h2 {
+	font-size: 1em;
+}
+article {
+	word-break: keep-all;
+	word-wrap: break-word;
+}
+
+section{
+	margin-bottom: 15px;
+}
+
+code {
+	font-size: 95%;
+}
+
+code>pre{
+    background: black none repeat scroll 0% 0%;
+    color: white;
+    padding: 10px;
+    overflow: scroll;
+    max-height: 200px;
+    line-height: 1.5em;
+}
+header span, header button {
+	position: relative;
+	float: left;
+	margin-bottom: 0px;
+	font-weight: 400;
+	vertical-align: middle;
+	/*cursor: pointer;*/
+	background-image: none;
+	white-space: nowrap;
+	padding: 2px 12px;
+	font-size: 115%;
+	line-height: 1.42857;
+	/*-moz-user-select: none;*/
+	display: inline-block;
+	text-align: center;
+}
+
+header span{
+	font-size: 1.6em;
+}
+
+header ul {
+	position: absolute;
+	float: left;
+	font-size: 14px;
+	background-color: #FFF;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 4px;
+	box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.176);
+	background-clip: padding-box;
+	min-width: 185px;
+	padding: 5px 10px;
+	margin: 2px 0px 0px;
+	z-index: 1000;
+	top: 100%;
+	visibility: hidden;
+	list-style: outside none none;
+	left: 240px;
+	visibility: hidden;
+}
+
+header div p:last-child {
+	margin-left: 20px;
+}
+
+body>div {
+	clear: both;
+}
+
+footer{
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+a.button {
+	border: 1px solid grey;
+	padding: 7px;
+	border-radius: 5px;
+	background: lightpink none repeat scroll 0% 0%;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a {
+	color: #444;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #666;
+}
+
+footer>a:visited {
+	color: white;
+}
+footer>a:visited {
+	text-decoration: none;
+}
+
+table {
+	margin: auto;
+	border-collapse: collapse;
+	/*border: 1px solid black;*/
+}
+
+th {
+	/*border: 1px solid #000;*/
+	padding: 3px 8px;
+}
+
+td {
+	padding: 6px;
+	border: 1px solid black;
+}
+
+td>ul {
+	padding-left: 18px;
+}
+
+td:nth-child(2), td:nth-child(3) {
+	text-align: center;
+}
+
+tr:nth-child(even) {
+	background-color: #fef;
+}
+
+td:first-child {
+	text-align: right;
+}
+
+img {
+	width: 100%;
+}
+
+aside {
+	border: 1px dashed;
+	font-size: 90%;
+	padding: 9px;
+	border-radius: 3px;
+}
+
+button#contents:hover {
+	color: purple;
+}
+
+.buttons {
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
+	background: pink none repeat scroll 0% 0%;
+	width: 100%;
+	padding: 10px 10px 0px;
+}
+
+.buttons>span{
+	padding-left: 0px;
+}
+
+.btn {
+	border-radius: 4px;
+	border: 2px solid transparent;
+}
+
+.added {
+	color: orange;
+}
+
+.special {
+	color: blueviolet;
+	border: solid #ccc thin;
+	border-radius: 2px;
+	padding: 1px 1px 0px 1px;
+	background: #fef;
+	font-family: monospace;
+	font-size: 84%;
+}
+
+#full_name>h1 {
+	text-align: center;
+}
+
+#track_table, #full_name {
+	font-family: Helvetica, 'sans-serif';
+}
