@@ -12,7 +12,7 @@ var app = express();
 var handlebars = require('express-handlebars').create({defaultLayout:'main'});
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
-app.set('port', 3002);
+app.set('port', 3003);
 
 /* set up body parser*/
 var bodyParser = require('body-parser');
