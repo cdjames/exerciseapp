@@ -97,7 +97,7 @@ app.get('/', function (req, res){
 
 app.post('/', function (req, res) {
   console.log("req.body=");
-  console.log(req.body);
+  console.log(req);
 
   var newworkout = "INSERT INTO workouts (name, reps, weight, date, lbs)" +
                     " VALUES (?, ?, ?, ?, ?)";
