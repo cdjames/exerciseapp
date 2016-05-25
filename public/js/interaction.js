@@ -4,6 +4,40 @@
 	** Description: Activity: How-to Guide, interaction code
 */
 document.addEventListener('DOMContentLoaded', configForm);
+// window.addEventListener("load", function () {
+// 	function sendForm() {
+// 		var ajax = new XMLHttpRequest();
+// 		var FD = new FormData(addform);
+// 		FD.append("CustomField", "This is some extra data");
+// 		// var formData = new FormData();
+// 		// formData.append('username', 'Collin');
+// 		// console.log("fd=");
+// 		// for (var p in FD) {
+// 		//   console.log(p);
+// 		// }
+
+// 		// ajax.setRequestHeader('Content-Type', 'application/json');
+// 		ajax.addEventListener('load', function () {
+// 			if(ajax.status >= 200 && ajax.status < 400){ // check for valid request
+// 				// var response = JSON.parse(ajax.responseText);
+// 				console.log(ajax.responseText);
+// 			} else {
+// 				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
+// 			}
+// 		});
+// 		ajax.open("POST", "/", true); // true for async
+// 		ajax.send(JSON.stringify(FD));
+// 	}
+
+// 	var addform = document.getElementById('addexercise');
+// 	addform.addEventListener("submit", function (event) {
+// 		event.preventDefault();
+
+// 		sendForm();
+// 	});
+
+
+// });
 document.addEventListener('DOMContentLoaded', bindClicks);
 // document.addEventListener('DOMContentLoaded', addCodeIndents);
 // document.addEventListener('DateOMContentLoaded', makeNav);
@@ -15,7 +49,11 @@ var USERID = 52119028,
 var YEARS = 5,
 	CUR_YEAR = new Date().getFullYear(),
 	OLDEST_USER = 0,
-	MONTHS = {January: 31, February: 29, March: 31, April: 30, May: 31, June: 30, July: 31, August: 31, September: 30, October: 31, November: 30, December: 31},
+	MONTHS = {January: {val: '01', days: 31}, February: {val: '02', days: 29}, 
+		March: {val: '03', days: 31}, April: {val: '04', days: 30}, May: {val: '05', days: 31}, 
+		June: {val: '06', days: 30}, July: {val: '07', days: 31}, August: {val: '08', days: 31}, 
+		September: {val: '09', days: 30}, October: {val: '10', days: 31}, 
+		November: {val: '11', days: 30}, December: {val: '12', days: 31}},
 	REPS = 100,
 	WEIGHT = 300;
 
@@ -33,16 +71,23 @@ function configForm () {
 		themonths = Object.keys(MONTHS),
 		mooption;
 	for (var i = 0; i < themonths.length; i++) {
+		var thismonth = themonths[i];
+		// console.log(thismonth);
 		mooption = document.createElement('option');
 		mooption.textContent = themonths[i];
+		mooption.setAttribute('data-name', themonths[i]);
+		// console.log(MONTHS[thismonth].val);
+		mooption.value = MONTHS[thismonth].val;
 		months.appendChild(mooption);
 	}
 
 	addDays(31); // for January
 	/* change days when months changed */
 	months.addEventListener('change', function (event) {
+		// console.log(event.target.selectedOptions[0].getAttribute('data-name'));
 		var selDay = document.getElementById('DOBdays').value,
-			ndays = MONTHS[event.target.value];
+			ndays = MONTHS[event.target.selectedOptions[0].getAttribute('data-name')].days;
+		
 		addDays(ndays);
 		/* update day selection to previous selection */
 		document.getElementById('DOBdays').value = (selDay <= ndays) ? selDay : ndays;	
@@ -76,6 +121,7 @@ function addDays (ndays) {
 	for (var i = 1; i <= numdays; i++) {
 		daoption = document.createElement('option');
 		daoption.textContent = i;
+		daoption.value = '0'+i;
 		days.appendChild(daoption);
 	}
 }
@@ -109,7 +155,7 @@ function bindMenuClicks () {
 function bindClicks () {
 	var update = document.getElementsByClassName('update'),
 		remove = document.getElementsByClassName('delete'),
-		add = document.getElementsByClassName('add');
+		add = document.getElementById('addexercise');
 
 	for (var i = 0; i < update.length; i++) {
 		update[i].addEventListener('click', function (event) {
@@ -133,12 +179,86 @@ function bindClicks () {
 	// 	console.log('clicked delete');
 	// 	event.preventDefault();
 	// });
+	add.addEventListener('submit', function (event) {
+		var ajax = new XMLHttpRequest();
+		var formData = {};
+		formData.name = document.getElementById('name').value;
+		formData.reps = parseInt(document.getElementById('reps').value);
+		formData.weight = parseInt(document.getElementById('weight').value);
+		formData.year = document.getElementById('DOByears').value;
+		formData.month = document.getElementById('DOBmonths').value;
+		formData.day = document.getElementById('DOBdays').value;
+		formData.lbs = parseInt(document.getElementById('lbs').value);
+		console.log(formData);
+		// var addform = document.getElementById('addexercise');
+		// var FD = new FormData(addform);
+		// var FD = new FormData();
+		// FD.append("CustomField", "This is some extra data");
+		// var formData = new FormData();
+		// formData.append('username', 'Collin');
+		// console.log("fd=");
+		// for (var p in FD) {
+		//   console.log(p);
+		// }
 
-	// add.addEventListener('click', function (event) {
-	// 	console.log('clicked add');
-	// 	event.preventDefault();
-	// });
+		ajax.open("POST", "/", true); // true for async
+
+		ajax.setRequestHeader('Content-Type', 'application/json');
+		ajax.addEventListener('load', function () {
+			if(ajax.status >= 200 && ajax.status < 400){ // check for valid request
+				var response = JSON.parse(ajax.responseText)[0];
+				console.log(response);
+				var new_tr = document.createElement('tr');
+				new_tr.id = response.id;
+				new_tr = createNAppend(new_tr, "td", response.name, ["ex_data"]);
+				new_tr = createNAppend(new_tr, "td", response.reps, ["ex_data"]);
+				var wgt_content;
+				if(response.weight){
+					wgt_content = response.weight;
+					if(response.lbs)
+						wgt_content += " lbs";
+					else
+						wgt_content +=" kg";
+				} else {
+					wgt_content = 'N/A';
+				}
+				new_tr = createNAppend(new_tr, "td", wgt_content, ["ex_data"]);
+				new_tr = createNAppend(new_tr, "td", response.date, ["ex_data"]);
+				var upd_btn = document.createElement('button');
+				upd_btn.class = 'update';
+				upd_btn.setAttribute('data-id', response.id);
+				upd_btn.textContent = 'update';
+				new_tr = createNAppend(new_tr, "td", upd_btn.outerHTML, ["ex_btn"]);
+				var del_btn = document.createElement('button');
+				del_btn.class = 'delete';
+				del_btn.setAttribute('data-id', response.id);
+				del_btn.textContent = 'delete';
+				new_tr = createNAppend(new_tr, "td", del_btn.outerHTML, ["ex_btn"]);
+				document.getElementById('ex_table_body').appendChild(new_tr);
+			} else {
+				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
+			}
+
+			function createNAppend (appendObj, type, content, classes)
+			{
+				var new_td = document.createElement(type);
+				for (var i = 0; i < classes.length; i++) {
+					// new_td.class = classes[i]
+					new_td.setAttribute('class', classes[i]);
+				}
+				new_td.innerHTML=content;
+				appendObj.appendChild(new_td);
+				return appendObj;
+			}
+		});
+		ajax.send(JSON.stringify(formData));
+		// ajax.send(FD);
+		// ajax.send('{"hey": "you"}');
+		event.preventDefault();
+	});
 }
+
+
 
 function doAPIcalls () {
 	var data, url;

@@ -48,7 +48,7 @@ app.get('/reset-table',function(req,res,next){
         return;
       }
       context.results = "Table reset";
-      console.log(context.results);
+      // console.log(context.results);
       var testworkout = "INSERT INTO workouts (name, reps, weight, date, lbs)" +
                         " VALUES ('bench press', 5, 90, '2016-05-25', 1), " +
                           "('squats', 10, NULL, '2016-05-25', 0)";
@@ -57,7 +57,7 @@ app.get('/reset-table',function(req,res,next){
           next(err);
           return;
         }
-        console.log(result);
+        // console.log(result);
         // pool.query("SELECT id,name,reps,weight, DATE_FORMAT(date, '%W, %M %Y') AS date, lbs FROM workouts", function (err, result) {
         //   if(err){
         //     next(err);
@@ -66,7 +66,7 @@ app.get('/reset-table',function(req,res,next){
         //   console.log(result);
         //   context.name = result[0].name;
         //   console.log(context);
-        //   res.send(context.name);
+          res.send(context.name);
         // });
       });
       // res.render('home',context);
@@ -84,15 +84,41 @@ app.get('/', function (req, res){
             next(err);
             return;
           }
-          console.log(result);
+          // console.log(result);
           context.exercise = result;
-          console.log(context);
+          // console.log(context);
           res.render('index.handlebars', context);
         });
   // if(thetitle)
   //   res.render(thetopic+'.handlebars', {title: thetitle, topic: thetopic});
   // else
   //   res.render('introduction.handlebars', {title: "Introduction", topic: 'introduction'});
+});
+
+app.post('/', function (req, res) {
+  console.log("req.body=");
+  console.log(req.body);
+
+  var newworkout = "INSERT INTO workouts (name, reps, weight, date, lbs)" +
+                    " VALUES (?, ?, ?, ?, ?)";
+  pool.query(newworkout, 
+             [req.body.name || 'awesome exercise', req.body.reps, req.body.weight,
+             req.body.year + '-' + req.body.month + '-' + req.body.day,
+             req.body.lbs], function (err, result) {
+    if(err){
+      next(err);
+      return;
+    }
+    pool.query("SELECT id,name,reps,weight, DATE_FORMAT(date, '%W, %M %D %Y') AS date, lbs FROM workouts" +
+               " WHERE id=" + result.insertId, function (err, result) {
+      if(err){
+        next(err);
+        return;
+      }
+      console.log(result);
+      res.send(result);
+    });
+  });
 })
 
 /* handle errors */

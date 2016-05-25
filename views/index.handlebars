@@ -5,7 +5,7 @@
 -->
 <div>
 	<div>
-		<form id="addexercise" method="post"> <!-- UPDATE THIS -->
+		<form name="addform" id="addexercise" method="post"> <!-- UPDATE THIS -->
 	      <fieldset>
 	        <legend>Add Exercise</legend>
 	        <label for="name">Name</label>
@@ -14,6 +14,11 @@
 	        <select id="reps" name="reps"></select>
 	        <label for="weight">Weight</label>
 	        <select id="weight" name="weight"></select>
+	        <label for="lbs">lbs/kg</label>
+	        <select id="lbs" name="lbs">
+	        	<option value=1>lbs</option>
+	        	<option value=0>kg</option>
+	        </select>
 	         <label for="date">Date</label>
 	        <!-- <input type="text" name="DOB" id="DOB"> -->
 	        <select id="DOByears" name="date"></select>
@@ -33,7 +38,7 @@
 					<th>date</th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody id="ex_table_body">
 			{{#each exercise}}
 				<tr id="{{this.id}}">
 					<!-- <input type="hidden" id="{{this.id}}"> -->
@@ -52,8 +57,8 @@
 						{{/if}}
 					</td>
 					<td class="ex_data">{{this.date}}</td>
-					<td class='ex_btn'><button class='update' data="{{this.id}}">update</button></td>
-					<td class='ex_btn'><button class='delete' data="{{this.id}}">delete</button></td>
+					<td class='ex_btn'><button class='update' data-id="{{this.id}}">update</button></td>
+					<td class='ex_btn'><button class='delete' data-id="{{this.id}}">delete</button></td>
 				</tr>
 			{{/each}}
 			</tbody>
