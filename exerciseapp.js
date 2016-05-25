@@ -20,19 +20,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 /* set up mysql */
-// var mysql = require('./mysql.js'), // mysql object is set up in js file
-//     pool = mysql.makepool();
-var mysql = require('mysql');
-var pool = mysql.createPool({
-  host  : 'localhost',
-  user  : 'student',
-  password: 'default',
-  database: 'student'
-});
+var mysql = require('./mysql.js'), // mysql object is set up in js file
+    pool = mysql.makepool();
 // console.log(pool);
 
-/* serve js, css, images (sample html: /js/app.js will look in
-  /public/js/... to find file */
+/* serve js, css, images (sample html: /js/app.js will look in /public/js/... to find file */
 app.use(express.static('public'));
 
 /* handle reset page */
@@ -51,35 +43,56 @@ app.get('/reset-table',function(req,res,next){
     "date DATE,"+
     "lbs BOOLEAN)";
     pool.query(createString, function(err){
-      // if(err){
-      //   next(err);
-      //   return;
-      // }
+      if(err){
+        next(err);
+        return;
+      }
       context.results = "Table reset";
       console.log(context.results);
-      // pool.query("INSERT INTO workouts (name) VALUES ('Collin James')", function (err, result) {
-      //   if(err){
-      //     next(err);
-      //     return;
-      //   }
-      //   console.log(result);
-      // });
+      var testworkout = "INSERT INTO workouts (name, reps, weight, date, lbs)" +
+                        " VALUES ('bench press', 5, 90, '2016-05-25', 1), " +
+                          "('squats', 10, NULL, '2016-05-25', 0)";
+      pool.query(testworkout, function (err, result) {
+        if(err){
+          next(err);
+          return;
+        }
+        console.log(result);
+        // pool.query("SELECT id,name,reps,weight, DATE_FORMAT(date, '%W, %M %Y') AS date, lbs FROM workouts", function (err, result) {
+        //   if(err){
+        //     next(err);
+        //     return;
+        //   }
+        //   console.log(result);
+        //   context.name = result[0].name;
+        //   console.log(context);
+        //   res.send(context.name);
+        // });
+      });
       // res.render('home',context);
-      res.send(context.results);
     });
   });
 });
 
 /* handle main pages */
 app.get('/', function (req, res){
-  res.type('html');
-  var qry = req.query,
-      thetopic = qry.topic,
-      thetitle = (thetopic) ? capitalize(thetopic.replace(/_/g, ' ')) : null;
-  if(thetitle)
-    res.render(thetopic+'.handlebars', {title: thetitle, topic: thetopic});
-  else
-    res.render('introduction.handlebars', {title: "Introduction", topic: 'introduction'});
+  // res.type('html');
+  var context = {};
+  context.title = 'Your Exercise Pal';
+  pool.query("SELECT id,name,reps,weight, DATE_FORMAT(date, '%W, %M %D %Y') AS date, lbs FROM workouts", function (err, result) {
+          if(err){
+            next(err);
+            return;
+          }
+          console.log(result);
+          context.exercise = result;
+          console.log(context);
+          res.render('index.handlebars', context);
+        });
+  // if(thetitle)
+  //   res.render(thetopic+'.handlebars', {title: thetitle, topic: thetopic});
+  // else
+  //   res.render('introduction.handlebars', {title: "Introduction", topic: 'introduction'});
 })
 
 /* handle errors */

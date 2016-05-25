@@ -7,36 +7,56 @@
 	<div>
 		<form id="addexercise" method="post"> <!-- UPDATE THIS -->
 	      <fieldset>
-	        <legend>Add User</legend>
+	        <legend>Add Exercise</legend>
 	        <label for="name">Name</label>
 	        <input type="text" name="name" id="name">
-	        <label for="listname">List Name</label>
-	        <input type="text" name="listname" id="listname">
-	         <label for="DOB">Date of birth</label>
+	        <label for="reps">Repetitions</label>
+	        <select id="reps" name="reps"></select>
+	        <label for="weight">Weight</label>
+	        <select id="weight" name="weight"></select>
+	         <label for="date">Date</label>
 	        <!-- <input type="text" name="DOB" id="DOB"> -->
-	        <select id="DOByears">
-	        </select>
-	        <select id="DOBmonths">
-	        </select>
-	        <select id="DOBdays">
-	        </select>
-	        <input type="submit" id="add" value="Add User">
+	        <select id="DOByears" name="date"></select>
+	        <select id="DOBmonths" name="date"></select>
+	        <select id="DOBdays" name="date"></select>
+	        <input type="submit" id="add" value="Add Exercise">
 	      </fieldset>
 	    </form>
     </div>
 	<div>
 		<table id="exercises">
-			<tr>
-				<th>Username</th>
-				<th>DOB</th>
-				<th>List</th>
-			</tr>
-			<tr>
-				<td>Sample Guy</td>
-				<td>1980-03-13</td>
-				<!-- example php anchor; want to change later, make dynamic -->
-				<td><a href="list.php?id=1">Mylist</a></td>
-			</tr>
+			<thead>
+				<tr>
+					<th>name</th>
+					<th>reps</th>
+					<th>weight</th>
+					<th>date</th>
+				</tr>
+			</thead>
+			<tbody>
+			{{#each exercise}}
+				<tr id="{{this.id}}">
+					<!-- <input type="hidden" id="{{this.id}}"> -->
+					<td class="ex_data">{{this.name}}</td>
+					<td class="ex_data">{{this.reps}}</td>
+					<!-- 90 lbs OR 90 kg OR N/A -->
+					<td class="ex_data">{{#if this.weight}}
+							{{this.weight}}
+							{{#if this.lbs}}
+								lbs
+							{{else}}
+								kg
+							{{/if}}
+						{{else}}
+							N/A
+						{{/if}}
+					</td>
+					<td class="ex_data">{{this.date}}</td>
+					<td class='ex_btn'><button class='update' data="{{this.id}}">update</button></td>
+					<td class='ex_btn'><button class='delete' data="{{this.id}}">delete</button></td>
+				</tr>
+			{{/each}}
+			</tbody>
 		</table>
 	</div>
 </div>

@@ -3,15 +3,84 @@
 	** Date: 5/18/16
 	** Description: Activity: How-to Guide, interaction code
 */
+document.addEventListener('DOMContentLoaded', configForm);
 document.addEventListener('DOMContentLoaded', bindClicks);
 // document.addEventListener('DOMContentLoaded', addCodeIndents);
-document.addEventListener('DOMContentLoaded', makeNav);
-document.addEventListener('DOMContentLoaded', doAPIcalls);
+// document.addEventListener('DateOMContentLoaded', makeNav);
+// document.addEventListener('DOMContentLoaded', doAPIcalls);
 
 var USERID = 52119028,
 	CLIENTID = '1306a99549a44496515f2e61993af805';
 
-function bindClicks () {
+var YEARS = 5,
+	CUR_YEAR = new Date().getFullYear(),
+	OLDEST_USER = 0,
+	MONTHS = {January: 31, February: 29, March: 31, April: 30, May: 31, June: 30, July: 31, August: 31, September: 30, October: 31, November: 30, December: 31},
+	REPS = 100,
+	WEIGHT = 300;
+
+function configForm () {
+	/* add year options */
+	var years = document.getElementById('DOByears'),
+		yroption;
+	for (var i = 0; i < YEARS; i++) {
+		yroption = document.createElement('option');
+		yroption.textContent = CUR_YEAR - OLDEST_USER - i;
+		years.appendChild(yroption);
+	}
+	/* add month options */
+	var months = document.getElementById('DOBmonths'),
+		themonths = Object.keys(MONTHS),
+		mooption;
+	for (var i = 0; i < themonths.length; i++) {
+		mooption = document.createElement('option');
+		mooption.textContent = themonths[i];
+		months.appendChild(mooption);
+	}
+
+	addDays(31); // for January
+	/* change days when months changed */
+	months.addEventListener('change', function (event) {
+		var selDay = document.getElementById('DOBdays').value,
+			ndays = MONTHS[event.target.value];
+		addDays(ndays);
+		/* update day selection to previous selection */
+		document.getElementById('DOBdays').value = (selDay <= ndays) ? selDay : ndays;	
+	});
+
+	/* add rep options */
+	var reps = document.getElementById('reps'),
+		repoption;
+	for (var i = 0; i < REPS+1; i++) {
+		repoption = document.createElement('option');
+		repoption.textContent = i;
+		reps.appendChild(repoption);
+	}
+
+	/* add rep options */
+	var weight = document.getElementById('weight'),
+		wtoption;
+	for (var i = 0; i < WEIGHT+1; i++) {
+		wtoption = document.createElement('option');
+		wtoption.textContent = i;
+		weight.appendChild(wtoption);
+	}
+}
+
+function addDays (ndays) {	
+	var days = document.getElementById('DOBdays'),
+		numdays = ndays,
+		daoption;
+		// console.log(numdays);
+	days.textContent=''; // clear the options
+	for (var i = 1; i <= numdays; i++) {
+		daoption = document.createElement('option');
+		daoption.textContent = i;
+		days.appendChild(daoption);
+	}
+}
+
+function bindMenuClicks () {
 	
 	var html = document.getElementsByTagName('html')[0];
 		contents = document.getElementById('contents'),
@@ -35,6 +104,40 @@ function bindClicks () {
 		});
 	};
 	
+}
+
+function bindClicks () {
+	var update = document.getElementsByClassName('update'),
+		remove = document.getElementsByClassName('delete'),
+		add = document.getElementsByClassName('add');
+
+	for (var i = 0; i < update.length; i++) {
+		update[i].addEventListener('click', function (event) {
+			console.log('clicked update');
+			var tr_id = event.target.getAttribute('data'),
+				this_tr = document.getElementById(tr_id),
+				tr_chldrn = this_tr.children;
+			for (var i = 0; i < tr_chldrn.length; i++) {
+				if(tr_chldrn[i].className === "ex_data")
+					console.log(tr_chldrn[i]);
+			};
+			event.preventDefault();
+		});
+	};
+	// update.addEventListener('click', function (event) {
+	// 	console.log('clicked update');
+	// 	event.preventDefault();
+	// });
+
+	// remove.addEventListener('click', function (event) {
+	// 	console.log('clicked delete');
+	// 	event.preventDefault();
+	// });
+
+	// add.addEventListener('click', function (event) {
+	// 	console.log('clicked add');
+	// 	event.preventDefault();
+	// });
 }
 
 function doAPIcalls () {

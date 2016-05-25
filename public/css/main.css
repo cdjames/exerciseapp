@@ -143,7 +143,7 @@ td:nth-child(2), td:nth-child(3) {
 	text-align: center;
 }
 
-tr:nth-child(even) {
+tr:nth-child(odd) td {
 	background-color: #fef;
 }
 
@@ -204,4 +204,8 @@ button#contents:hover {
 
 #track_table, #full_name {
 	font-family: Helvetica, 'sans-serif';
+}
+
+.ex_btn {
+	border: 1px dotted grey;
 }
