@@ -4,40 +4,6 @@
 	** Description: Activity: How-to Guide, interaction code
 */
 document.addEventListener('DOMContentLoaded', configForm);
-// window.addEventListener("load", function () {
-// 	function sendForm() {
-// 		var ajax = new XMLHttpRequest();
-// 		var FD = new FormData(addform);
-// 		FD.append("CustomField", "This is some extra data");
-// 		// var formData = new FormData();
-// 		// formData.append('username', 'Collin');
-// 		// console.log("fd=");
-// 		// for (var p in FD) {
-// 		//   console.log(p);
-// 		// }
-
-// 		// ajax.setRequestHeader('Content-Type', 'application/json');
-// 		ajax.addEventListener('load', function () {
-// 			if(ajax.status >= 200 && ajax.status < 400){ // check for valid request
-// 				// var response = JSON.parse(ajax.responseText);
-// 				console.log(ajax.responseText);
-// 			} else {
-// 				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
-// 			}
-// 		});
-// 		ajax.open("POST", "/", true); // true for async
-// 		ajax.send(JSON.stringify(FD));
-// 	}
-
-// 	var addform = document.getElementById('addexercise');
-// 	addform.addEventListener("submit", function (event) {
-// 		event.preventDefault();
-
-// 		sendForm();
-// 	});
-
-
-// });
 document.addEventListener('DOMContentLoaded', bindClicks);
 // document.addEventListener('DOMContentLoaded', addCodeIndents);
 // document.addEventListener('DateOMContentLoaded', makeNav);
@@ -181,6 +147,7 @@ function bindClicks () {
 	// });
 	add.addEventListener('submit', function (event) {
 		var ajax = new XMLHttpRequest();
+		/* manually create form (couldn't get FormData object to work) */
 		var formData = {};
 		formData.name = document.getElementById('name').value;
 		formData.reps = parseInt(document.getElementById('reps').value);
@@ -190,24 +157,16 @@ function bindClicks () {
 		formData.day = document.getElementById('DOBdays').value;
 		formData.lbs = parseInt(document.getElementById('lbs').value);
 		console.log(formData);
-		// var addform = document.getElementById('addexercise');
-		// var FD = new FormData(addform);
-		// var FD = new FormData();
-		// FD.append("CustomField", "This is some extra data");
-		// var formData = new FormData();
-		// formData.append('username', 'Collin');
-		// console.log("fd=");
-		// for (var p in FD) {
-		//   console.log(p);
-		// }
 
 		ajax.open("POST", "/", true); // true for async
 
 		ajax.setRequestHeader('Content-Type', 'application/json');
+		
 		ajax.addEventListener('load', function () {
 			if(ajax.status >= 200 && ajax.status < 400){ // check for valid request
 				var response = JSON.parse(ajax.responseText)[0];
 				console.log(response);
+				/* create new row to put in table */
 				var new_tr = document.createElement('tr');
 				new_tr.id = response.id;
 				new_tr = createNAppend(new_tr, "td", response.name, ["ex_data"]);
@@ -224,6 +183,7 @@ function bindClicks () {
 				}
 				new_tr = createNAppend(new_tr, "td", wgt_content, ["ex_data"]);
 				new_tr = createNAppend(new_tr, "td", response.date, ["ex_data"]);
+				/* create and append buttons */
 				var upd_btn = document.createElement('button');
 				upd_btn.class = 'update';
 				upd_btn.setAttribute('data-id', response.id);
@@ -234,6 +194,7 @@ function bindClicks () {
 				del_btn.setAttribute('data-id', response.id);
 				del_btn.textContent = 'delete';
 				new_tr = createNAppend(new_tr, "td", del_btn.outerHTML, ["ex_btn"]);
+				/* append to the tbody */
 				document.getElementById('ex_table_body').appendChild(new_tr);
 			} else {
 				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
@@ -243,7 +204,6 @@ function bindClicks () {
 			{
 				var new_td = document.createElement(type);
 				for (var i = 0; i < classes.length; i++) {
-					// new_td.class = classes[i]
 					new_td.setAttribute('class', classes[i]);
 				}
 				new_td.innerHTML=content;
@@ -251,9 +211,8 @@ function bindClicks () {
 				return appendObj;
 			}
 		});
+
 		ajax.send(JSON.stringify(formData));
-		// ajax.send(FD);
-		// ajax.send('{"hey": "you"}');
 		event.preventDefault();
 	});
 }
