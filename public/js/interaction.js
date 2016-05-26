@@ -141,7 +141,7 @@ function addDays (ndays, id) {
 	for (var i = 1; i <= numdays; i++) {
 		daoption = document.createElement('option');
 		daoption.textContent = i;
-		daoption.value = '0'+i;
+		daoption.value = (i < 10) ? '0'+i : i;
 		days.appendChild(daoption);
 	}
 }
@@ -172,26 +172,71 @@ function bindMenuClicks () {
 	
 }
 
+function updateListener (element) {
+	element.addEventListener('click', function (event) {
+		showHide(document.getElementById('upd_outer'));
+		var tr_id = event.target.getAttribute('data-id');
+		console.log(tr_id);
+
+		var ajax = new XMLHttpRequest();
+		var data = {id: tr_id};
+		ajax.open("POST", "/select_row", true); // true for async
+
+		ajax.setRequestHeader('Content-Type', 'application/json');
+		
+		ajax.addEventListener('load', function () {
+			if(ajax.status >= 200 && ajax.status < 400){
+				var response = JSON.parse(ajax.responseText)[0];
+				console.log(response);
+				/* put values in update fields */
+				var up_name = document.getElementById('up_name');
+				up_name.value = response.name;
+				var up_reps = document.getElementById('up_reps');
+				up_reps.value = response.reps;
+				var up_weight = document.getElementById('up_weight');
+				up_weight.value = response.weight;
+				var up_lbs = document.getElementById('up_lbs');
+				up_lbs.value = response.lbs;
+				var up_DOByears = document.getElementById('up_DOByears');
+				up_DOByears.value = response.year;
+				var up_DOBmonths = document.getElementById('up_DOBmonths');
+				up_DOBmonths.value = response.month;
+				var up_DOBdays = document.getElementById('up_DOBdays');
+				up_DOBdays.value = response.day;
+
+			} else {
+				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
+			}
+		});
+			// this_tr = document.getElementById(tr_id),
+			// tr_chldrn = this_tr.children;
+		// for (var i = 0; i < tr_chldrn.length; i++) {
+		// 	if(tr_chldrn[i].className === "ex_data")
+		// 		console.log(tr_chldrn[i]);
+		// };
+		ajax.send(JSON.stringify(data));
+		event.preventDefault();
+		/* upon pushing update, a copy of the add form for should be displayed over the page
+		but with its data pre-populated and an extra "cancel" button. */
+	});
+}
+
 function bindClicks () {
 	var update = document.getElementsByClassName('update'),
 		remove = document.getElementsByClassName('delete'),
-		add = document.getElementById('addexercise');
+		add = document.getElementById('addexercise'),
+		cancel_update = document.getElementById('cancel_update');
 
 	for (var i = 0; i < update.length; i++) {
-		update[i].addEventListener('click', function (event) {
-			console.log('clicked update');
-			var tr_id = event.target.getAttribute('data-id'),
-				this_tr = document.getElementById(tr_id),
-				tr_chldrn = this_tr.children;
-			for (var i = 0; i < tr_chldrn.length; i++) {
-				if(tr_chldrn[i].className === "ex_data")
-					console.log(tr_chldrn[i]);
-			};
-			event.preventDefault();
-			/* upon pushing update, a copy of the add form for should be displayed over the page
-			but with its data pre-populated and an extra "cancel" button. */
-		});
-	};
+		updateListener(update[i]);
+	}
+
+	/* bind post action to */
+
+	cancel_update.addEventListener('click', function (event) {
+		event.preventDefault();
+		showHide(document.getElementById('upd_outer'));
+	});
 	// update.addEventListener('click', function (event) {
 	// 	console.log('clicked update');
 	// 	event.preventDefault();
@@ -240,18 +285,22 @@ function bindClicks () {
 				new_tr = createNAppend(new_tr, "td", wgt_content, ["ex_data"]);
 				new_tr = createNAppend(new_tr, "td", response.date, ["ex_data"]);
 				/* create and append buttons */
-				var upd_btn = document.createElement('button');
-				upd_btn.class = 'update';
+				var upd_btn = document.createElement('button'),
+					new_btn_class = 'new_btn' + response.id;
+				upd_btn.setAttribute('class', 'update '+ new_btn_class);
 				upd_btn.setAttribute('data-id', response.id);
 				upd_btn.textContent = 'update';
 				new_tr = createNAppend(new_tr, "td", upd_btn.outerHTML, ["ex_btn"]);
+				/* delete button */
 				var del_btn = document.createElement('button');
-				del_btn.class = 'delete';
+				del_btn.setAttribute('class', 'delete');
 				del_btn.setAttribute('data-id', response.id);
 				del_btn.textContent = 'delete';
 				new_tr = createNAppend(new_tr, "td", del_btn.outerHTML, ["ex_btn"]);
 				/* append to the tbody */
 				document.getElementById('ex_table_body').appendChild(new_tr);
+				/* add event listener for update button */
+				updateListener(document.getElementsByClassName(new_btn_class)[0]);
 			} else {
 				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
 			}
@@ -271,6 +320,13 @@ function bindClicks () {
 		ajax.send(JSON.stringify(formData));
 		event.preventDefault();
 	});
+}
+
+function showHide(element, dispType){
+	if(element.style.display === "" || element.style.display === "none")
+		element.style.display = dispType || 'block';
+	else
+		element.style.display = 'none';
 }
 
 function makeNav () {

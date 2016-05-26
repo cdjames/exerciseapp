@@ -119,7 +119,23 @@ app.post('/', function (req, res) {
       res.send(result);
     });
   });
-})
+});
+
+app.post('/select_row', function (req, res) {
+  pool.query("SELECT id,name,reps,weight, " +
+             "DATE_FORMAT(date, '%Y') AS year," + 
+             "DATE_FORMAT(date, '%m') AS month," + 
+             "DATE_FORMAT(date, '%d') AS day," + 
+             " lbs FROM workouts" +
+               " WHERE id=" + req.body.id, function (err, result) {
+      if(err){
+        next(err);
+        return;
+      }
+      console.log(result);
+      res.send(result);
+    });
+});
 
 /* handle errors */
 app.use(function(req,res){

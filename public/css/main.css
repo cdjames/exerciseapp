@@ -11,7 +11,8 @@ body {
 }
 
 div, article, footer{
-	padding: 0px 10px;
+	padding: 0px 0px;
+	text-align: center;
 }
 
 h2 {
@@ -208,4 +209,29 @@ button#contents:hover {
 
 .ex_btn {
 	border: 1px dotted grey;
+}
+
+#upd_outer{
+	display: none;
+	position: fixed;
+	top: 0px;
+	width: 100%;
+	padding: 0px;
+	z-index: 0;
+	height: 8000px;
+	background: rgba(9, 9, 9, 0.71) none repeat scroll 23% 16%;
+}
+
+#add_wrapper{
+	padding: 0px 10px;
+}
+
+#update_wrapper{
+	position: fixed;
+	top: 30%;
+	z-index: 5;
+	background: #FFF none repeat scroll 0% 0%;
+	width: 95%;
+	left: 50%;
+	margin-left: -47.5%;
 }

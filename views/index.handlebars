@@ -4,7 +4,7 @@
 	** Description: Final Project - Database Interactions and UI
 -->
 <div>
-	<div>
+	<div id="add_wrapper">
 		<form name="addform" id="addexercise" method="post"> <!-- UPDATE THIS -->
 	      <fieldset>
 	        <legend>Add Exercise</legend>
@@ -29,30 +29,35 @@
 	    </form>
     </div>
     <div>
-		<form name="updateform" id="updateexercise" method="post"> <!-- UPDATE THIS -->
-	      <fieldset>
-	        <legend>Update Exercise</legend>
-	        <label for="name">Name</label>
-	        <input type="text" name="name" id="up_name">
-	        <label for="reps">Repetitions</label>
-	        <select id="up_reps" name="reps"></select>
-	        <label for="weight">Weight</label>
-	        <select id="up_weight" name="weight"></select>
-	        <label for="lbs">lbs/kg</label>
-	        <select id="up_lbs" name="lbs">
-	        	<option value=1>lbs</option>
-	        	<option value=0>kg</option>
-	        </select>
-	         <label for="date">Date</label>
-	        <!-- <input type="text" name="DOB" id="DOB"> -->
-	        <select id="up_DOByears" name="date"></select>
-	        <select id="up_DOBmonths" name="date"></select>
-	        <select id="up_DOBdays" name="date"></select>
-	        <input type="submit" id="update" value="Update">
-	        <button id="cancel_update">Cancel</button>
-	      </fieldset>
-	    </form>
+    <div id="upd_outer">
+    	<div id='update_wrapper'>
+			<form name="updateform" id="updateexercise" method="post"> <!-- UPDATE THIS -->
+		      <fieldset>
+		        <legend>Update Exercise</legend>
+		        <label for="name">Name</label>
+		        <input type="text" name="name" id="up_name">
+		        <label for="reps">Repetitions</label>
+		        <select id="up_reps" name="reps"></select>
+		        <label for="weight">Weight</label>
+		        <select id="up_weight" name="weight"></select>
+		        <label for="lbs">lbs/kg</label>
+		        <select id="up_lbs" name="lbs">
+		        	<option value=1>lbs</option>
+		        	<option value=0>kg</option>
+		        </select>
+		         <label for="date">Date</label>
+		        <!-- <input type="text" name="DOB" id="DOB"> -->
+		        <select id="up_DOByears" name="date"></select>
+		        <select id="up_DOBmonths" name="date"></select>
+		        <select id="up_DOBdays" name="date"></select>
+		        <input type="submit" id="update" value="Update">
+		        <button id="cancel_update">Cancel</button>
+		      </fieldset>
+		    </form>
+	    </div>
     </div>
+</div>
+    
 	<div>
 		<table id="exercises">
 			<thead>
