@@ -96,8 +96,8 @@ app.get('/', function (req, res){
 });
 
 app.post('/', function (req, res) {
-  console.log("req.body=");
-  console.log(req);
+  // console.log("req.body=");
+  // console.log(req);
 
   var newworkout = "INSERT INTO workouts (name, reps, weight, date, lbs)" +
                     " VALUES (?, ?, ?, ?, ?)";
@@ -115,7 +115,7 @@ app.post('/', function (req, res) {
         next(err);
         return;
       }
-      console.log(result);
+      // console.log(result);
       res.send(result);
     });
   });
@@ -132,11 +132,35 @@ app.post('/select_row', function (req, res) {
         next(err);
         return;
       }
-      console.log(result);
+      // console.log(result);
       res.send(result);
     });
 });
 
+app.post('/update', function (req, res) {
+  console.log("req.body=");
+  console.log(req);
+
+  var updateworkout = "";//UPDATE query here
+  pool.query(newworkout, 
+             [req.body.name || 'awesome exercise', req.body.reps, req.body.weight,
+             req.body.year + '-' + req.body.month + '-' + req.body.day,
+             req.body.lbs], function (err, result) {
+    if(err){
+      next(err);
+      return;
+    }
+    pool.query("SELECT id,name,reps,weight, DATE_FORMAT(date, '%W, %M %D %Y') AS date, lbs FROM workouts" +
+               " WHERE id=" + result.insertId, function (err, result) {
+      if(err){
+        next(err);
+        return;
+      }
+      console.log(result);
+      res.send("success");
+    });
+  });
+});
 /* handle errors */
 app.use(function(req,res){
   res.type('text/plain');

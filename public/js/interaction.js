@@ -189,6 +189,8 @@ function updateListener (element) {
 				var response = JSON.parse(ajax.responseText)[0];
 				console.log(response);
 				/* put values in update fields */
+				var up_id = document.getElementById('up_id');
+				up_name.setAttribute('data-id', response.id);
 				var up_name = document.getElementById('up_name');
 				up_name.value = response.name;
 				var up_reps = document.getElementById('up_reps');
@@ -225,13 +227,42 @@ function bindClicks () {
 	var update = document.getElementsByClassName('update'),
 		remove = document.getElementsByClassName('delete'),
 		add = document.getElementById('addexercise'),
-		cancel_update = document.getElementById('cancel_update');
+		cancel_update = document.getElementById('cancel_update'),
+		do_update = document.getElementById('updateexercise');
 
 	for (var i = 0; i < update.length; i++) {
 		updateListener(update[i]);
 	}
 
-	/* bind post action to */
+	/* bind post action to do_update button */
+	do_update.addEventListener('submit', function (event) {
+		event.preventDefault();
+		var ajax = new XMLHttpRequest();
+		/* manually create form (couldn't get FormData object to work) */
+		var formData = {};
+		formData.id = document.getElementById('up_id').getAttribute('data-id');
+		formData.name = document.getElementById('up_name').value;
+		formData.reps = parseInt(document.getElementById('up_reps').value);
+		formData.weight = parseInt(document.getElementById('up_weight').value);
+		formData.year = document.getElementById('up_DOByears').value;
+		formData.month = document.getElementById('up_DOBmonths').value;
+		formData.day = document.getElementById('up_DOBdays').value;
+		formData.lbs = parseInt(document.getElementById('up_lbs').value);
+		console.log(formData);
+
+		ajax.open("POST", "/update", true); // true for async
+
+		ajax.setRequestHeader('Content-Type', 'application/json');
+		
+		ajax.addEventListener('load', function () {
+			if(ajax.status >= 200 && ajax.status < 400){
+				var response = JSON.parse(ajax.responseText)[0];
+				console.log(response);
+			} else {
+				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
+			}
+		});
+	});
 
 	cancel_update.addEventListener('click', function (event) {
 		event.preventDefault();
