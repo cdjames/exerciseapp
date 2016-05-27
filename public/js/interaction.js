@@ -308,7 +308,7 @@ function bindClicks () {
 						new_btn_class = 'new_btn' + response.id;
 					upd_btn.setAttribute('class', 'update '+ new_btn_class);
 					upd_btn.setAttribute('data-id', response.id);
-					upd_btn.textContent = 'update';
+					upd_btn.textContent = 'edit';
 					new_tr = createNAppend(new_tr, "td", upd_btn.outerHTML, ["ex_btn"]);
 					/* delete button */
 					var del_btn = document.createElement('button');
@@ -346,10 +346,15 @@ function bindClicks () {
 	// 	event.preventDefault();
 	// });
 	add.addEventListener('submit', function (event) {
+		event.preventDefault();
 		var ajax = new XMLHttpRequest();
 		/* manually create form (couldn't get FormData object to work) */
 		var formData = {};
 		formData.name = document.getElementById('name').value;
+		if (!formData.name) {
+			alert('whoops, need a name!');
+			return;
+		}
 		formData.reps = parseInt(document.getElementById('reps').value);
 		formData.weight = parseInt(document.getElementById('weight').value);
 		formData.year = document.getElementById('DOByears').value;
@@ -388,7 +393,7 @@ function bindClicks () {
 					new_btn_class = 'new_btn' + response.id;
 				upd_btn.setAttribute('class', 'update '+ new_btn_class);
 				upd_btn.setAttribute('data-id', response.id);
-				upd_btn.textContent = 'update';
+				upd_btn.textContent = 'edit';
 				new_tr = createNAppend(new_tr, "td", upd_btn.outerHTML, ["ex_btn"]);
 				/* delete button */
 				var del_btn = document.createElement('button');
@@ -408,7 +413,7 @@ function bindClicks () {
 		});
 
 		ajax.send(JSON.stringify(formData));
-		event.preventDefault();
+		
 	});
 }
 
