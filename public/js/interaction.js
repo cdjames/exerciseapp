@@ -174,7 +174,6 @@ function bindMenuClicks () {
 
 function updateListener (element) {
 	element.addEventListener('click', function (event) {
-		showHide(document.getElementById('upd_outer'));
 		var tr_id = event.target.getAttribute('data-id');
 		console.log(tr_id);
 
@@ -190,9 +189,11 @@ function updateListener (element) {
 				console.log(response);
 				/* put values in update fields */
 				var up_id = document.getElementById('up_id');
-				up_name.setAttribute('data-id', response.id);
+				up_id.setAttribute('data-id', response.id);
 				var up_name = document.getElementById('up_name');
 				up_name.value = response.name;
+				// save original name in data-name
+				up_name.setAttribute('data-name', response.name);
 				var up_reps = document.getElementById('up_reps');
 				up_reps.value = response.reps;
 				var up_weight = document.getElementById('up_weight');
@@ -205,7 +206,7 @@ function updateListener (element) {
 				up_DOBmonths.value = response.month;
 				var up_DOBdays = document.getElementById('up_DOBdays');
 				up_DOBdays.value = response.day;
-
+				showHide(document.getElementById('upd_outer'));
 			} else {
 				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
 			}
@@ -240,8 +241,9 @@ function bindClicks () {
 		var ajax = new XMLHttpRequest();
 		/* manually create form (couldn't get FormData object to work) */
 		var formData = {};
-		formData.id = document.getElementById('up_id').getAttribute('data-id');
-		formData.name = document.getElementById('up_name').value;
+		formData.id = parseInt(document.getElementById('up_id').getAttribute('data-id'));
+		/* if name is blank, get the saved name in data-name */
+		formData.name = document.getElementById('up_name').value || document.getElementById('up_name').getAttribute('data-name');
 		formData.reps = parseInt(document.getElementById('up_reps').value);
 		formData.weight = parseInt(document.getElementById('up_weight').value);
 		formData.year = document.getElementById('up_DOByears').value;
@@ -257,11 +259,54 @@ function bindClicks () {
 		ajax.addEventListener('load', function () {
 			if(ajax.status >= 200 && ajax.status < 400){
 				var response = JSON.parse(ajax.responseText)[0];
+				// var response = ajax.responseText;
 				console.log(response);
+				if(response){
+					// put data back in row
+					/* create new row to put in table */
+					var new_tr = document.createElement('tr');
+					new_tr.id = response.id;
+					new_tr = createNAppend(new_tr, "td", response.name, ["ex_data"]);
+					new_tr = createNAppend(new_tr, "td", response.reps, ["ex_data"]);
+					var wgt_content;
+					if(response.weight){
+						wgt_content = response.weight;
+						if(response.lbs)
+							wgt_content += " lbs";
+						else
+							wgt_content +=" kg";
+					} else {
+						wgt_content = 'N/A';
+					}
+					new_tr = createNAppend(new_tr, "td", wgt_content, ["ex_data"]);
+					new_tr = createNAppend(new_tr, "td", response.date, ["ex_data"]);
+					/* create and append buttons */
+					var upd_btn = document.createElement('button'),
+						new_btn_class = 'new_btn' + response.id;
+					upd_btn.setAttribute('class', 'update '+ new_btn_class);
+					upd_btn.setAttribute('data-id', response.id);
+					upd_btn.textContent = 'update';
+					new_tr = createNAppend(new_tr, "td", upd_btn.outerHTML, ["ex_btn"]);
+					/* delete button */
+					var del_btn = document.createElement('button');
+					del_btn.setAttribute('class', 'delete');
+					del_btn.setAttribute('data-id', response.id);
+					del_btn.textContent = 'delete';
+					new_tr = createNAppend(new_tr, "td", del_btn.outerHTML, ["ex_btn"]);
+					/* append to the tbody */
+					// document.getElementById('ex_table_body').appendChild(new_tr);
+					console.log(document.getElementById(response.id));
+					document.getElementById(response.id).innerHTML = new_tr.innerHTML;
+					/* add event listener for update button */
+					updateListener(document.getElementsByClassName(new_btn_class)[0]);
+					showHide(document.getElementById('upd_outer'));
+				}
 			} else {
 				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
 			}
 		});
+
+		ajax.send(JSON.stringify(formData));
 	});
 
 	cancel_update.addEventListener('click', function (event) {
@@ -336,21 +381,23 @@ function bindClicks () {
 				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
 			}
 
-			function createNAppend (appendObj, type, content, classes)
-			{
-				var new_td = document.createElement(type);
-				for (var i = 0; i < classes.length; i++) {
-					new_td.setAttribute('class', classes[i]);
-				}
-				new_td.innerHTML=content;
-				appendObj.appendChild(new_td);
-				return appendObj;
-			}
+			
 		});
 
 		ajax.send(JSON.stringify(formData));
 		event.preventDefault();
 	});
+}
+
+function createNAppend (appendObj, type, content, classes)
+{
+	var new_td = document.createElement(type);
+	for (var i = 0; i < classes.length; i++) {
+		new_td.setAttribute('class', classes[i]);
+	}
+	new_td.innerHTML=content;
+	appendObj.appendChild(new_td);
+	return appendObj;
 }
 
 function showHide(element, dispType){

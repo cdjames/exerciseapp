@@ -138,26 +138,32 @@ app.post('/select_row', function (req, res) {
 });
 
 app.post('/update', function (req, res) {
-  console.log("req.body=");
-  console.log(req);
+  // console.log("req.body=");
+  // console.log(req);
 
-  var updateworkout = "";//UPDATE query here
-  pool.query(newworkout, 
-             [req.body.name || 'awesome exercise', req.body.reps, req.body.weight,
-             req.body.year + '-' + req.body.month + '-' + req.body.day,
-             req.body.lbs], function (err, result) {
+  pool.query("SELECT name FROM workouts WHERE id=?", [req.body.id], function (err, result) {
     if(err){
       next(err);
       return;
     }
-    pool.query("SELECT id,name,reps,weight, DATE_FORMAT(date, '%W, %M %D %Y') AS date, lbs FROM workouts" +
-               " WHERE id=" + result.insertId, function (err, result) {
+    var updateworkout = "UPDATE workouts SET name=?, reps=?, weight=?, date=?, lbs=? WHERE id=?",
+        date = req.body.year + '-' + req.body.month + '-' + req.body.day;
+    pool.query(updateworkout, 
+               [req.body.name || result.name, req.body.reps, req.body.weight,
+               date, req.body.lbs, req.body.id], function (err, result) {
       if(err){
         next(err);
         return;
       }
-      console.log(result);
-      res.send("success");
+      pool.query("SELECT id,name,reps,weight, DATE_FORMAT(date, '%W, %M %D %Y') AS date, lbs FROM workouts" +
+                 " WHERE id=" + req.body.id, function (err, result) {
+        if(err){
+          next(err);
+          return;
+        }
+        console.log(result);
+        res.send(result);
+      });
     });
   });
 });
