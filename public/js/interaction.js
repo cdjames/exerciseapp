@@ -211,16 +211,35 @@ function updateListener (element) {
 				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
 			}
 		});
-			// this_tr = document.getElementById(tr_id),
-			// tr_chldrn = this_tr.children;
-		// for (var i = 0; i < tr_chldrn.length; i++) {
-		// 	if(tr_chldrn[i].className === "ex_data")
-		// 		console.log(tr_chldrn[i]);
-		// };
+			
 		ajax.send(JSON.stringify(data));
 		event.preventDefault();
-		/* upon pushing update, a copy of the add form for should be displayed over the page
-		but with its data pre-populated and an extra "cancel" button. */
+	});
+}
+
+function deleteListener (element) {
+	element.addEventListener('click', function (event) {
+		var tbody = document.getElementById('ex_table_body'),
+			tr_id = event.target.getAttribute('data-id'),
+			tr = document.getElementById(tr_id);
+		console.log("tr-id="+tr_id);
+
+		var ajax = new XMLHttpRequest();
+		var data = {id: tr_id};
+		ajax.open("POST", "/delete", true); // true for async
+
+		ajax.setRequestHeader('Content-Type', 'application/json');
+		
+		ajax.addEventListener('load', function () {
+			if(ajax.status >= 200 && ajax.status < 400){
+				tbody.removeChild(tr);
+				console.log(ajax.responseText);
+			} else {
+				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
+			}
+		});
+		ajax.send(JSON.stringify(data));
+		event.preventDefault();
 	});
 }
 
@@ -234,6 +253,10 @@ function bindClicks () {
 	for (var i = 0; i < update.length; i++) {
 		updateListener(update[i]);
 	}
+
+	for (var i = 0; i < remove.length; i++) {
+		deleteListener(remove[i]);
+	};
 
 	/* bind post action to do_update button */
 	do_update.addEventListener('submit', function (event) {

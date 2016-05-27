@@ -167,6 +167,17 @@ app.post('/update', function (req, res) {
     });
   });
 });
+
+app.post('/delete', function (req, res) {
+  pool.query("DELETE FROM workouts WHERE id=?", [req.body.id], function (err, result) {
+    if(err){
+      next(err);
+      return;
+    }
+    res.send('success');
+  });
+});
+
 /* handle errors */
 app.use(function(req,res){
   res.type('text/plain');
