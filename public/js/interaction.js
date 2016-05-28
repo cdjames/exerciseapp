@@ -1,18 +1,21 @@
 /*
 	** Author: Collin James, CS 290
-	** Date: 5/18/16
-	** Description: Activity: How-to Guide, interaction code
+	** Date: 5/28/16
+	** Description: Activity: Final Project - Database Interactions and UI, interaction code
 */
-document.addEventListener('DOMContentLoaded', configForm);
-document.addEventListener('DOMContentLoaded', configUpdateForm);
+
+/* configure forms */
+document.addEventListener('DOMContentLoaded', function () {
+	configForms({years: "DOByears", months: "DOBmonths", days: "DOBdays", reps: "reps", weight: "weight"});
+	configForms({years: "up_DOByears", months: "up_DOBmonths", days: "up_DOBdays", reps: "up_reps", weight: "up_weight"});
+});
+
 document.addEventListener('DOMContentLoaded', bindClicks);
-// document.addEventListener('DateOMContentLoaded', makeNav);
 
-var USERID = 52119028,
-	CLIENTID = '1306a99549a44496515f2e61993af805';
-
+/* Global variables */
 var YEARS = 5,
-	CUR_YEAR = new Date().getFullYear(),
+	CUR_DATE = new Date();
+	CUR_YEAR = CUR_DATE.getFullYear(),
 	OLDEST_USER = 0,
 	MONTHS = {January: {val: '01', days: 31}, February: {val: '02', days: 29}, 
 		March: {val: '03', days: 31}, April: {val: '04', days: 30}, May: {val: '05', days: 31}, 
@@ -22,44 +25,46 @@ var YEARS = 5,
 	REPS = 100,
 	WEIGHT = 300;
 
-function configForm () {
+/* configure forms. pass in object with date ids: 
+   {years: 'yearid', months: 'monthid', days: 'daysid} */
+function configForms (ids) {
+
 	/* add year options */
-	var years = document.getElementById('DOByears'),
+	var years = document.getElementById(ids.years),
 		yroption;
 	for (var i = 0; i < YEARS; i++) {
 		yroption = document.createElement('option');
 		yroption.textContent = CUR_YEAR - OLDEST_USER - i;
 		years.appendChild(yroption);
 	}
+
 	/* add month options */
-	var months = document.getElementById('DOBmonths'),
+	var months = document.getElementById(ids.months),
 		themonths = Object.keys(MONTHS),
 		mooption;
 	for (var i = 0; i < themonths.length; i++) {
 		var thismonth = themonths[i];
-		// console.log(thismonth);
 		mooption = document.createElement('option');
 		mooption.textContent = themonths[i];
 		mooption.setAttribute('data-name', themonths[i]);
-		// console.log(MONTHS[thismonth].val);
 		mooption.value = MONTHS[thismonth].val;
 		months.appendChild(mooption);
 	}
 
-	addDays(31, 'DOBdays'); // for January
-	/* change days when months changed */
-	months.addEventListener('change', function (event) {
-		// console.log(event.target.selectedOptions[0].getAttribute('data-name'));
-		var selDay = document.getElementById('DOBdays').value,
-			ndays = MONTHS[event.target.selectedOptions[0].getAttribute('data-name')].days;
-		
-		addDays(ndays, 'DOBdays');
-		/* update day selection to previous selection */
-		document.getElementById('DOBdays').value = (selDay <= ndays) ? selDay : ndays;	
-	});
+	/* select current month */
+	addMonthListener(months, ids.days);
+	var cur_mnth = getTwoDigitNum(CUR_DATE.getMonth() + 1);
+	months.value = cur_mnth;
+	// change days for current month
+	simulateListener("change", ids.months);
+
+	/* set current day */
+	var days = document.getElementById(ids.days),
+		cur_day = getTwoDigitNum(CUR_DATE.getDate());
+	days.value = cur_day;
 
 	/* add rep options */
-	var reps = document.getElementById('reps'),
+	var reps = document.getElementById(ids.reps),
 		repoption;
 	for (var i = 0; i < REPS+1; i++) {
 		repoption = document.createElement('option');
@@ -68,7 +73,7 @@ function configForm () {
 	}
 
 	/* add rep options */
-	var weight = document.getElementById('weight'),
+	var weight = document.getElementById(ids.weight),
 		wtoption;
 	for (var i = 0; i < WEIGHT+1; i++) {
 		wtoption = document.createElement('option');
@@ -77,59 +82,36 @@ function configForm () {
 	}
 }
 
-function configUpdateForm () {
-	/* add year options */
-	var years = document.getElementById('up_DOByears'),
-		yroption;
-	for (var i = 0; i < YEARS; i++) {
-		yroption = document.createElement('option');
-		yroption.textContent = CUR_YEAR - OLDEST_USER - i;
-		years.appendChild(yroption);
-	}
-	/* add month options */
-	var months = document.getElementById('up_DOBmonths'),
-		themonths = Object.keys(MONTHS),
-		mooption;
-	for (var i = 0; i < themonths.length; i++) {
-		var thismonth = themonths[i];
-		// console.log(thismonth);
-		mooption = document.createElement('option');
-		mooption.textContent = themonths[i];
-		mooption.setAttribute('data-name', themonths[i]);
-		// console.log(MONTHS[thismonth].val);
-		mooption.value = MONTHS[thismonth].val;
-		months.appendChild(mooption);
-	}
+/** helpers for configForms **/
 
-	addDays(31, 'up_DOBdays'); // for January
-	/* change days when months changed */
-	months.addEventListener('change', function (event) {
-		// console.log(event.target.selectedOptions[0].getAttribute('data-name'));
-		var selDay = document.getElementById('up_DOBdays').value,
-			ndays = MONTHS[event.target.selectedOptions[0].getAttribute('data-name')].days;
-		
-		addDays(ndays, 'up_DOBdays');
-		/* update day selection to previous selection */
-		document.getElementById('up_DOBdays').value = (selDay <= ndays) ? selDay : ndays;	
+function addMonthListener(element, id) {
+  element.addEventListener('change', function (event) {
+	var selDay = document.getElementById(id).value,
+		ndays = MONTHS[event.target.selectedOptions[0].getAttribute('data-name')].days;
+	
+	addDays(ndays, id);
+	/* update day selection to previous selection */
+	document.getElementById(id).value = (selDay <= ndays) ? selDay : ndays;	
 	});
+}
 
-	/* add rep options */
-	var reps = document.getElementById('up_reps'),
-		repoption;
-	for (var i = 0; i < REPS+1; i++) {
-		repoption = document.createElement('option');
-		repoption.textContent = i;
-		reps.appendChild(repoption);
-	}
-
-	/* add rep options */
-	var weight = document.getElementById('up_weight'),
-		wtoption;
-	for (var i = 0; i < WEIGHT+1; i++) {
-		wtoption = document.createElement('option');
-		wtoption.textContent = i;
-		weight.appendChild(wtoption);
-	}
+/* simulate events (clicks, changes, etc.) */
+function simulateListener(type, id) {
+  var event = new MouseEvent(type, {
+    'view': window,
+    'bubbles': true,
+    'cancelable': true
+  });
+  var cb = document.getElementById(id); 
+  // console.log(cb);
+  var canceled = !cb.dispatchEvent(event);
+  if (canceled) {
+    // A handler called preventDefault.
+    console.log(type + " simulateion canceled");
+  } else {
+    // None of the handlers called preventDefault.
+    console.log(type + " simulated on " + id);
+  }
 }
 
 function addDays (ndays, id) {	
@@ -146,36 +128,13 @@ function addDays (ndays, id) {
 	}
 }
 
-function bindMenuClicks () {
-	
-	var html = document.getElementsByTagName('html')[0];
-		contents = document.getElementById('contents'),
-		dropdown = document.getElementById('dropdown'),
-		drpdwnLi = dropdown.children;
-	// console.log(html);
-	html.addEventListener('click', function (event) {
-		dropdown.style.visibility = 'hidden';
-		// event.preventDefault();
-	});
-	
-	contents.addEventListener('click', function (event) {
-		hideEl(dropdown);
-		event.stopPropagation();
-	});
+/** end form helpers **/
 
-	for (var i = 0; i < drpdwnLi.length; i++) {
-		drpdwnLi[i].firstElementChild.addEventListener('click', function (event) {
-			hideEl(dropdown);
-			// event.preventDefault();
-		});
-	};
-	
-}
-
+/* function to use for update button listener */
 function updateListener (element) {
 	element.addEventListener('click', function (event) {
 		var tr_id = event.target.getAttribute('data-id');
-		console.log(tr_id);
+		// console.log(tr_id);
 
 		var ajax = new XMLHttpRequest();
 		var data = {id: tr_id};
@@ -186,7 +145,7 @@ function updateListener (element) {
 		ajax.addEventListener('load', function () {
 			if(ajax.status >= 200 && ajax.status < 400){
 				var response = JSON.parse(ajax.responseText)[0];
-				console.log(response);
+				// console.log(response);
 				/* put values in update fields */
 				var up_id = document.getElementById('up_id');
 				up_id.setAttribute('data-id', response.id);
@@ -217,12 +176,13 @@ function updateListener (element) {
 	});
 }
 
+/* function to use for delete button listener */
 function deleteListener (element) {
 	element.addEventListener('click', function (event) {
 		var tbody = document.getElementById('ex_table_body'),
 			tr_id = event.target.getAttribute('data-id'),
 			tr = document.getElementById(tr_id);
-		console.log("tr-id="+tr_id);
+		// console.log("tr-id="+tr_id);
 
 		var ajax = new XMLHttpRequest();
 		var data = {id: tr_id};
@@ -233,7 +193,7 @@ function deleteListener (element) {
 		ajax.addEventListener('load', function () {
 			if(ajax.status >= 200 && ajax.status < 400){
 				tbody.removeChild(tr);
-				console.log(ajax.responseText);
+				// console.log(ajax.responseText);
 			} else {
 				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
 			}
@@ -243,6 +203,7 @@ function deleteListener (element) {
 	});
 }
 
+/* handle clicks on all buttons and forms */
 function bindClicks () {
 	var update = document.getElementsByClassName('update'),
 		remove = document.getElementsByClassName('delete'),
@@ -273,7 +234,7 @@ function bindClicks () {
 		formData.month = document.getElementById('up_DOBmonths').value;
 		formData.day = document.getElementById('up_DOBdays').value;
 		formData.lbs = parseInt(document.getElementById('up_lbs').value);
-		console.log(formData);
+		// console.log(formData);
 
 		ajax.open("POST", "/update", true); // true for async
 
@@ -283,7 +244,7 @@ function bindClicks () {
 			if(ajax.status >= 200 && ajax.status < 400){
 				var response = JSON.parse(ajax.responseText)[0];
 				// var response = ajax.responseText;
-				console.log(response);
+				// console.log(response);
 				if(response){
 					// put data back in row
 					/* create new row to put in table */
@@ -311,17 +272,18 @@ function bindClicks () {
 					upd_btn.textContent = 'edit';
 					new_tr = createNAppend(new_tr, "td", upd_btn.outerHTML, ["ex_btn"]);
 					/* delete button */
-					var del_btn = document.createElement('button');
-					del_btn.setAttribute('class', 'delete');
+					var del_btn = document.createElement('button'),
+						new_del_class = new_btn_class + '_del';
+					del_btn.setAttribute('class', 'delete ' + new_del_class);
 					del_btn.setAttribute('data-id', response.id);
 					del_btn.textContent = 'delete';
 					new_tr = createNAppend(new_tr, "td", del_btn.outerHTML, ["ex_btn"]);
 					/* append to the tbody */
-					// document.getElementById('ex_table_body').appendChild(new_tr);
-					console.log(document.getElementById(response.id));
 					document.getElementById(response.id).innerHTML = new_tr.innerHTML;
-					/* add event listener for update button */
+					/* add event listener for buttons */
 					updateListener(document.getElementsByClassName(new_btn_class)[0]);
+					deleteListener(document.getElementsByClassName(new_del_class)[0]);
+					
 					showHide(document.getElementById('upd_outer'));
 				}
 			} else {
@@ -331,20 +293,14 @@ function bindClicks () {
 
 		ajax.send(JSON.stringify(formData));
 	});
-
+	
+	/* bind post action to cancel button*/
 	cancel_update.addEventListener('click', function (event) {
 		event.preventDefault();
 		showHide(document.getElementById('upd_outer'));
 	});
-	// update.addEventListener('click', function (event) {
-	// 	console.log('clicked update');
-	// 	event.preventDefault();
-	// });
-
-	// remove.addEventListener('click', function (event) {
-	// 	console.log('clicked delete');
-	// 	event.preventDefault();
-	// });
+	
+	/* bind post action to add exercise button */
 	add.addEventListener('submit', function (event) {
 		event.preventDefault();
 		var ajax = new XMLHttpRequest();
@@ -361,7 +317,7 @@ function bindClicks () {
 		formData.month = document.getElementById('DOBmonths').value;
 		formData.day = document.getElementById('DOBdays').value;
 		formData.lbs = parseInt(document.getElementById('lbs').value);
-		console.log(formData);
+		// console.log(formData);
 
 		ajax.open("POST", "/", true); // true for async
 
@@ -370,7 +326,7 @@ function bindClicks () {
 		ajax.addEventListener('load', function () {
 			if(ajax.status >= 200 && ajax.status < 400){ // check for valid request
 				var response = JSON.parse(ajax.responseText)[0];
-				console.log(response);
+				// console.log(response);
 				/* create new row to put in table */
 				var new_tr = document.createElement('tr');
 				new_tr.id = response.id;
@@ -396,8 +352,9 @@ function bindClicks () {
 				upd_btn.textContent = 'edit';
 				new_tr = createNAppend(new_tr, "td", upd_btn.outerHTML, ["ex_btn"]);
 				/* delete button */
-				var del_btn = document.createElement('button');
-				del_btn.setAttribute('class', 'delete');
+				var del_btn = document.createElement('button'),
+					new_del_class = new_btn_class + '_del';
+				del_btn.setAttribute('class', 'delete ' + new_del_class);
 				del_btn.setAttribute('data-id', response.id);
 				del_btn.textContent = 'delete';
 				new_tr = createNAppend(new_tr, "td", del_btn.outerHTML, ["ex_btn"]);
@@ -405,6 +362,7 @@ function bindClicks () {
 				document.getElementById('ex_table_body').appendChild(new_tr);
 				/* add event listener for update button */
 				updateListener(document.getElementsByClassName(new_btn_class)[0]);
+				deleteListener(document.getElementsByClassName(new_del_class)[0]);
 			} else {
 				console.log("Whoops, something went wrong. Maybe: ", ajax.statusText);
 			}
@@ -417,14 +375,18 @@ function bindClicks () {
 	});
 }
 
+/** a few more helpers **/
+
+/* create a new element and append to passed element 
+	classes is an array */
 function createNAppend (appendObj, type, content, classes)
 {
-	var new_td = document.createElement(type);
+	var new_el = document.createElement(type);
 	for (var i = 0; i < classes.length; i++) {
-		new_td.setAttribute('class', classes[i]);
+		new_el.setAttribute('class', classes[i]);
 	}
-	new_td.innerHTML=content;
-	appendObj.appendChild(new_td);
+	new_el.innerHTML=content;
+	appendObj.appendChild(new_el);
 	return appendObj;
 }
 
@@ -435,76 +397,7 @@ function showHide(element, dispType){
 		element.style.display = 'none';
 }
 
-function makeNav () {
-	var next_page = document.getElementById('next_page'),
-		prev_page = document.getElementById('prev_page'),
-		curr = document.getElementById('curr_page').textContent, // get curr_page button and textContent
-		curr_item = document.getElementById(curr), // find the item in the header
-		prev_item = curr_item.previousElementSibling; // get its previous item and append the value to prev button
-		next_item = curr_item.nextElementSibling; // get its next item and append the value to next button
-	
-	if(prev_item) {
-		prev_page.setAttribute("href", "/?topic="+prev_item.id);
-		prev_page.setAttribute("title", prev_item.textContent);
-	} else {
-		prev_page.style.display = "none";
-	}
-	
-	if(next_item){
-		next_page.setAttribute("href", "/?topic="+next_item.id);
-		next_page.setAttribute("title", next_item.textContent);
-	} else {
-		next_page.style.display = "none";
-	}
-}
-
-function hideEl (element) {
-	element.style.visibility = (element.style.visibility != 'visible') ? 'visible' : 'hidden';
-}
-
-function buildTable (data, headers, keys) {
-	var table = document.createElement("table"), // the table element
-		tr; // hold rows before appending
-
-	/* build headers*/
-	tr = buildRow(headers, "th");
-	table.appendChild(tr);
-
-	/* build rows */
-	data.forEach(function (object, index) {
-		var values = []
-			track_id = object.id;
-		/* make an array of values */
-		for (var i = 0; i < keys.length; i++) {
-			if(keys[i] != "")
-				values.push(object[keys[i]]);
-			else
-				values.push("");
-		};
-	
-		/* add a row */
-		tr = buildRow(values, "td", track_id);
-		table.appendChild(tr);
-	})
-
-	/* */
-	function buildRow (array, type, track_id) { // an array of 
-		var thisTr = document.createElement("tr"),
-			column;
-		/* create <td> or <th> elements */
-		array.forEach(function (content) {
-			column = document.createElement(type);
-			/* for non-header items */
-			column.textContent = content;
-			/* add content and style */
-			// column.style.border = "solid 1px black";
-			thisTr.id = track_id;
-			thisTr.appendChild(column);
-		});
-		return thisTr;
-	}
-
-	table.style.borderCollapse = "collapse";
-	// console.log(table);
-	return table;
+function getTwoDigitNum (number) {
+	(number < 10) ? number = "0" + number : number.toString();
+	return number; // this is a string
 }
